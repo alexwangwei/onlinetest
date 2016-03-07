@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<constant name="struts.devMode" value="false" />
+	<constant name="struts.action.excludePattern" value="/Admin/.*?" />
+
+	<!-- <constant name="struts.objectFactory" value="spring" /> -->
+
+	<package name="onlinetestadmin" extends="struts-default"
+		namespace="/admin">
+		<action name="login" class="loginAction" method="login">
+			<result name="input">/Admin/login.jsp</result>
+			<result name="success">/Admin/home.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="logout" class="loginAction" method="logout">
+			<result name="success">/Admin/login.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="home" class="homeAction">
+			<result name="success">/Admin/home.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="addgroup" class="groupmanagementAction" method="addGroup">
+			<result name="success" type="redirect">listgroup</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="updategroup" class="groupmanagementAction"
+			method="updateGroup">
+			<result name="success" type="redirect">listgroup</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="delgroup" class="groupmanagementAction" method="delGroup">
+			<result name="success" type="redirect">listgroup</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="listgroup" class="groupmanagementAction" method="listGroup">
+			<result name="success">/Admin/groupmanagement.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="adduser" class="usermanagementAction" method="addUser">
+			<result name="success" type="redirect">listuser</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="updateuser" class="usermanagementAction" method="updateUser">
+			<result name="success" type="redirect">listuser</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="deluser" class="usermanagementAction" method="delUser">
+			<result name="success" type="redirect">listuser</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="listuser" class="usermanagementAction" method="listUser">
+			<result name="success">/Admin/usermanagement.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="listusergroup" class="userandgroupmanagementAction"
+			method="listUserGroup">
+			<result name="success">/Admin/usrandgroup.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="updateusergroup" class="userandgroupmanagementAction"
+			method="updateUserGroup">
+			<result name="success" type="redirect">listusergroup</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="listsubject" class="subjectmanagementAction"
+			method="listSubject">
+			<result name="success">/Admin/submgnt.jsp</result>
+		</action>
+
+		<action name="addsubject" class="subjectmanagementAction"
+			method="addSubject">
+			<result name="success" type="redirect">listsubject</result>
+		</action>
+
+		<action name="delsubject" class="subjectmanagementAction"
+			method="delSubject">
+			<result name="success" type="redirect">listsubject</result>
+		</action>
+
+		<action name="listquestion" class="questionmanagementAction"
+			method="listQuestion">
+			<result name="success">/Admin/question_list.jsp</result>
+		</action>
+
+		<action name="addquestion" class="questionmanagementAction"
+			method="addQuestion">
+			<result name="success" type="redirect">listquestion</result>
+		</action>
+
+		<action name="delquestion" class="questionmanagementAction"
+			method="delQuestion">
+			<result name="success" type="redirect">listquestion</result>
+		</action>
+
+		<action name="newquestion" class="newquestionAction" method="newQuestion">
+			<result name="success">/Admin/new_question.jsp</result>
+		</action>
+
+		<action name="savequestion" class="newquestionAction" method="saveQuestion">
+			<result name="success" type="redirect">listquestion</result>
+		</action>
+
+		<action name="listpaper" class="paperAction" method="listPaper">
+			<result name="success">/Admin/paper_list.jsp</result>
+		</action>
+
+		<action name="manualnewpaper" class="manualpaperAction" method="newPaper">
+			<result name="success">/Admin/new_paper_1.jsp</result>
+		</action>
+
+		<action name="query" class="manualpaperAction" method="query">
+			<result name="success" type="redirect">manual2</result>
+		</action>
+
+		<action name="addtopaper" class="manualpaperAction" method="addToPaper">
+			<result name="success" type="redirect">manual2</result>
+		</action>
+
+		<action name="manual2" class="manualpaperAction" method="step2">
+			<result name="success">/Admin/new_paper_2.jsp</result>
+		</action>
+
+		<action name="manual3" class="manualpaperAction" method="step3">
+			<result name="success">/Admin/new_paper_3.jsp</result>
+		</action>
+
+		<action name="submitpaper" class="manualpaperAction" method="submitPaper">
+			<result name="success" type="redirect">listpaper</result>
+		</action>
+
+		<action name="delpaper" class="paperAction" method="deletePaper">
+			<result name="success" type="redirect">listpaper</result>
+		</action>
+
+		<action name="listschedule" class="schedulelistAction" method="listSchedule">
+			<result name="success">/Admin/schedule_list.jsp</result>
+		</action>
+
+		<action name="delschedule" class="schedulelistAction" method="delSchedule">
+			<result name="success" type="redirect">listschedule</result>
+		</action>
+
+		<action name="newschedule" class="newscheduleAction" method="input">
+			<result name="success">/Admin/new_schedule.jsp</result>
+		</action>
+
+		<action name="saveschedule" class="newscheduleAction" method="save">
+			<result name="success" type="redirect">listschedule</result>
+		</action>
+
+		<action name="publish" class="taskmanagementAction" method="publish">
+			<result name="success" type="redirect">listschedule</result>
+		</action>
+
+		<action name="resultview" class="resultviewAction" method="list">
+			<result name="success">/Admin/result_list.jsp</result>
+		</action>
+	</package>
+
+	<package name="onlinetest" extends="struts-default" namespace="/student">
+		<action name="login" class="loginAction" method="login">
+			<result name="input">/Student/login.jsp</result>
+			<result name="success" type="redirect">task</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="logout" class="loginAction" method="logout">
+			<result name="success">/Student/login.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="task" class="taskAction" method="listTask">
+			<result name="success">/Student/index.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="displayinfo" class="taskAction" method="display">
+			<result name="success">/Student/message.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="doexam" class="examAction" method="doExam">
+			<result name="success">/Student/examdesk.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="saveexam" class="examAction" method="saveExam">
+			<result name="success" type="redirect">doexam</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="submitexam" class="examAction" method="submitExam">
+			<result name="success">/Student/success.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="resultlist" class="resultreportAction" method="resultList">
+			<result name="success">/Student/result_report.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+	</package>
+
+	<package name="test" extends="struts-default" namespace="/test">
+		<action name="test" class="testAction">
+			<result name="success">/Admin/json.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+	</package>
+
+</struts>

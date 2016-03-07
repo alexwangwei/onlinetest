@@ -1,0 +1,18 @@
+	<package name="onlinetestjson" extends="json-default"
+		namespace="/admin/json">
+		<action name="getallquestion" class="questionjsonAction"
+			method="getAllQuestion">
+			<!-- 返回类型为json 在sjon-default中定义 -->
+			<result type="json" name="success">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">data</param>
+			</result>
+		</action>
+		<action name="getallquestionbysubject" class="questionjsonAction"
+			method="getAllQuestionBySubject">
+			<result type="json" name="success">
+				<param name="root">data</param>
+			</result>
+		</action>
+	</package>

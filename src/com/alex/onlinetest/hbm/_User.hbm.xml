@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.alex.onlinetest.hbm">
+	<!-- 映射User持久化类 -->
+	<class name="User" table="USER">
+		<!-- 映射标识属性id -->
+		<id name="id" column="USER_ID">
+			<!-- 定义主键生成器策略 -->
+			<generator class="increment" />
+		</id>
+		<!-- 用于映射普通属性 -->
+		<property name="loginId" length="25" column="LOGIN_ID" unique="true" />
+		<property name="displayName" length="25" column="DISPLAY_NAME" />
+		<property name="password" length="25" column="PASSWORD" />
+		<!-- 映射集合属性，集合元素是其他持久化实体，没有指定cascade属性，指定不控制关联关系 -->
+		<set name="role" inverse="true" table="user_role">
+			<!-- 指定关联的外键列 -->
+			<key column="USER_ID" />
+			<!-- 用以映射到关联类属性 -->
+			<many-to-many class="Role" column="ROLE_ID" unique="true" />
+		</set>
+		<set name="group" inverse="true" table="user_group">
+			<!-- 指定关联的外键列 -->
+			<key column="USER_ID" />
+			<!-- 用以映射到关联类属性 -->
+			<many-to-many class="UserGroup" column="GROUP_ID" unique="true" />
+		</set>
+	</class>
+
+</hibernate-mapping>

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.2.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.2.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+	
+	<!-- Spring Task -->
+	<task:annotation-driven/>
+	<context:component-scan base-package="com.alex.onlinetest.task" />
+	
+
+	<!-- 定义数据源Bean，使用C3P0数据源实现 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<!-- 指定连接数据库的驱动 -->
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<!-- 指定连接数据库的URL -->
+		<property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/onlinetest_release" />
+		<!-- 指定连接数据库的用户名 -->
+		<property name="user" value="root" />
+		<!-- 指定连接数据库的密码 -->
+		<property name="password" value="!qaz2wsx" />
+		<!-- 指定连接数据库连接池的最大连接数 -->
+		<property name="maxPoolSize" value="40" />
+		<!-- 指定连接数据库连接池的最小连接数  -->
+		<property name="minPoolSize" value="1" />
+		<!-- 指定连接数据库连接池的初始化连接数  -->
+		<property name="initialPoolSize" value="1" />
+		<!-- 指定连接数据库连接池的连接的最大空闲时间  -->
+		<property name="maxIdleTime" value="20" />
+	</bean>
+	
+	<!-- 定义 Hibernate5 的 SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<list>
+				<!-- 以下用来列出所有的PO映射Class-->
+				<value>com.alex.onlinetest.hbm.Role</value>
+				<value>com.alex.onlinetest.hbm.UserGroup</value>
+				<value>com.alex.onlinetest.hbm.User</value>
+				<value>com.alex.onlinetest.hbm.Navigator</value>
+				<value>com.alex.onlinetest.hbm.Subject</value>
+				<value>com.alex.onlinetest.hbm.Question</value>
+				<value>com.alex.onlinetest.hbm.QuestionOption</value>
+				<value>com.alex.onlinetest.hbm.Paper</value>
+				<value>com.alex.onlinetest.hbm.Schedule</value>
+				<value>com.alex.onlinetest.hbm.Task</value>
+				<value>com.alex.onlinetest.hbm.Item</value>
+				<value>com.alex.onlinetest.hbm.ResultReport</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<!-- 设置 Hibernate 属性 -->
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQLDialect
+				hibernate.hbm2ddl.auto=update
+				hibernate.show_sql=true
+				hibernate.format_sql=true;
+			</value>
+		</property>
+	</bean>
+	
+	<!-- 配置事务 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />		
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="*" read-only="false" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut expression="bean(*Dao*)" id="alexPointcut"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="alexPointcut"/>
+	</aop:config>
+	
+	<!-- 定义 DAO Bean -->
+	<bean id="pageresultDaoSupport" class="com.alex.onlinetest.dao.impl.PageResultDaoSupport">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="dynamicQueryDaoSupport" class="com.alex.onlinetest.dao.impl.DynamicQueryDaoSupport">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="roleDao" class="com.alex.onlinetest.dao.impl.RoleDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="pageResultDaoSupport" ref="pageresultDaoSupport" />
+	</bean>
+	<bean id="userDao" class="com.alex.onlinetest.dao.impl.UserDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="pageResultDaoSupport" ref="pageresultDaoSupport" />
+	</bean>
+	<bean id="usergroupDao" class="com.alex.onlinetest.dao.impl.UserGroupDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="pageResultDaoSupport" ref="pageresultDaoSupport" />
+	</bean>
+	<bean id="navDao" class="com.alex.onlinetest.dao.impl.NavigatorDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="subjectDao" class="com.alex.onlinetest.dao.impl.SubjectDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="questionDao" class="com.alex.onlinetest.dao.impl.QuestionDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="pageResultDaoSupport" ref="pageresultDaoSupport" />
+		<property name="dynamicQueryDaoSupport" ref="dynamicQueryDaoSupport" />
+	</bean>
+	<bean id="paperDao" class="com.alex.onlinetest.dao.impl.PaperDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="pageResultDaoSupport" ref="pageresultDaoSupport" />
+	</bean>
+	<bean id="scheduleDao" class="com.alex.onlinetest.dao.impl.ScheduleDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="pageResultDaoSupport" ref="pageresultDaoSupport" />
+	</bean>
+	<bean id="taskDao" class="com.alex.onlinetest.dao.impl.TaskDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="pageResultDaoSupport" ref="pageresultDaoSupport" />
+	</bean>
+	<bean id="itemDao" class="com.alex.onlinetest.dao.impl.ItemDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="pageResultDaoSupport" ref="pageresultDaoSupport" />
+	</bean>
+	<bean id="resultreportDao" class="com.alex.onlinetest.dao.impl.ResultReportDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="pageResultDaoSupport" ref="pageresultDaoSupport" />
+	</bean>
+	
+	<!-- 定义 Service Bean -->
+	<bean id="userManagement" class="com.alex.onlinetest.admin.service.impl.UserManagementImpl">
+		<property name="userDao" ref="userDao" />
+	</bean>
+	<bean id="navManagement" class="com.alex.onlinetest.admin.service.impl.NavigatorManagementImpl">
+		<property name="navDao" ref="navDao" />
+	</bean>
+	<bean id="groupManagement" class="com.alex.onlinetest.admin.service.impl.GroupManagementImpl">
+		<property name="usrgrpDao" ref="usergroupDao" />
+		<property name="usrmgnt" ref="userManagement" />
+	</bean>
+	<bean id="subjectManagement" class="com.alex.onlinetest.admin.service.impl.SubjectManagementImpl">
+		<property name="subDao" ref="subjectDao" />
+	</bean>
+	<bean id="questionManagement" class="com.alex.onlinetest.admin.service.impl.QuestionManagementImpl">
+		<property name="questionDao" ref="questionDao" />
+	</bean>
+	<bean id="paperManagement" class="com.alex.onlinetest.admin.service.impl.PaperManagementImpl">
+		<property name="paperDao" ref="paperDao" />
+	</bean>
+	<bean id="scheduleManagement" class="com.alex.onlinetest.admin.service.impl.ScheduleManagementImpl">
+		<property name="scheduleDao" ref="scheduleDao" />
+	</bean>
+	<bean id="taskManagement" class="com.alex.onlinetest.admin.service.impl.TaskManagementImpl">
+		<property name="taskDao" ref="taskDao" />
+		<property name="itemDao" ref="itemDao" />
+		<property name="rrm" ref="resultreportManagement" />
+	</bean>
+	<bean id="resultreportManagement" class="com.alex.onlinetest.admin.service.impl.ResultReportManagementImpl">
+		<property name="rrDao" ref="resultreportDao" />
+	</bean>
+	
+	<!-- 定义Action -->
+	<bean id="loginAction" class="com.alex.onlinetest.privilege.action.PrivilegeAction" scope="prototype">
+		<property name="um" ref="userManagement" />
+	</bean>
+	<bean id="homeAction" class="com.alex.onlinetest.admin.action.AdminHomeAction" scope="prototype">
+		<property name="nav" ref="navManagement" />
+	</bean>
+	<bean id="groupmanagementAction" class="com.alex.onlinetest.admin.action.GroupManagementAction" scope="prototype">
+		<property name="gm" ref="groupManagement" />
+	</bean>
+	<bean id="usermanagementAction" class="com.alex.onlinetest.admin.action.UserManagementAction" scope="prototype">
+		<property name="um" ref="userManagement" />
+	</bean>
+	<bean id="userandgroupmanagementAction" class="com.alex.onlinetest.admin.action.UserAndGroupManagementAction" scope="prototype">
+		<property name="um" ref="userManagement" />
+		<property name="gm" ref="groupManagement" />
+	</bean>
+	<bean id="subjectmanagementAction" class="com.alex.onlinetest.admin.action.SubjectManagementAction" scope="prototype">
+		<property name="sm" ref="subjectManagement" />
+	</bean>
+	<bean id="questionmanagementAction" class="com.alex.onlinetest.admin.action.QuestionManagementAction" scope="prototype">
+		<property name="qm" ref="questionManagement" />
+	</bean>
+	<bean id="newquestionAction" class="com.alex.onlinetest.admin.action.NewQuestionAction" scope="prototype">
+		<property name="qm" ref="questionManagement" />
+		<property name="sm" ref="subjectManagement" />
+	</bean>
+	<bean id="paperAction" class="com.alex.onlinetest.admin.action.PaperManagementAction" scope="prototype">
+		<property name="pm" ref="paperManagement" />
+	</bean>
+	<bean id="manualpaperAction" class="com.alex.onlinetest.admin.action.ManualPaperManagementAction" scope="session">
+		<property name="pm" ref="paperManagement" />
+		<property name="sm" ref="subjectManagement" />
+		<property name="qm" ref="questionManagement" />
+	</bean>
+	<bean id="schedulelistAction" class="com.alex.onlinetest.admin.action.ScheduleListAction" scope="prototype">
+		<property name="schm" ref="scheduleManagement" />
+	</bean>
+	<bean id="newscheduleAction" class="com.alex.onlinetest.admin.action.NewScheduleAction" scope="prototype">
+		<property name="schm" ref="scheduleManagement" />
+		<property name="pm" ref="paperManagement" />
+		<property name="gm" ref="groupManagement" />
+	</bean>
+	<bean id="taskmanagementAction" class="com.alex.onlinetest.admin.action.TaskManagementAction" scope="prototype">
+		<property name="qm" ref="questionManagement" />
+		<property name="tm" ref="taskManagement" />
+		<property name="schm" ref="scheduleManagement" />
+		<property name="gm" ref="groupManagement" />
+		<property name="pm" ref="paperManagement" />
+	</bean>
+	<bean id="resultviewAction" class="com.alex.onlinetest.admin.action.ResultViewAction" scope="prototype">
+		<property name="rrm" ref="resultreportManagement" />
+		<property name="schm" ref="scheduleManagement" />
+	</bean>
+	
+	<!-- Student Action -->
+	<bean id="taskAction" class="com.alex.onlinetest.student.action.TaskAction" scope="prototype">
+		<property name="tm" ref="taskManagement" />
+		<property name="um" ref="userManagement" />
+	</bean>
+	<bean id="examAction" class="com.alex.onlinetest.student.action.ExamAction" scope="prototype">
+		<property name="tm" ref="taskManagement" />
+		<property name="um" ref="userManagement" />
+		<property name="qm" ref="questionManagement" />
+		<property name="pm" ref="paperManagement" />
+	</bean>
+	<bean id="resultreportAction" class="com.alex.onlinetest.student.action.ResultReportAction" scope="prototype">
+		<property name="rrm" ref="resultreportManagement" />
+		<property name="um" ref="userManagement" />
+	</bean>
+	
+	<!-- Json Action Admin -->
+	<bean id="questionjsonAction" class="com.alex.onlinetest.admin.action.json.QuestionJsonAction" scope="prototype">
+		<property name="qm" ref="questionManagement" />
+	</bean>
+	<bean id="ajaxnewpaperAction" class="com.alex.onlinetest.admin.action.NewPaperJsonAction" scope="prototype">
+	</bean>
+	<bean id="newpaperAction" class="com.alex.onlinetest.admin.action.NewPaperAction" scope="prototype">
+		<property name="sm" ref="subjectManagement" />
+		<property name="qm" ref="questionManagement" />
+		<property name="pm" ref="paperManagement" />
+	</bean>
+	<!-- Test Action -->
+	<bean id="testAction" class="com.alex.onlinetest.admin.action.TestAction" scope="prototype">
+	</bean>
+
+	
+</beans>

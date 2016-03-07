@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.alex.onlinetest.hbm">
+	<!-- Role持久化类 -->
+	<class name="Role" table="ROLE">
+		<!-- 映射标识属性id -->
+		<id name="id" column="ROLE_ID">
+			<!-- 定义主键生成器策略 -->
+			<generator class="increment" />
+		</id>
+		<!-- 用于映射普通属性 -->
+		<property name="roleName" length="25" column="ROLE_NAME" />
+		<!-- 必须指定列名为，与关联实体中key元素的column属性值相同 -->
+		<join table="user_role">
+			<key column="ROLE_ID" />
+			<many-to-one name="user" column="USER_ID" not-null="true" />
+		</join>
+		
+	</class>
+
+</hibernate-mapping>
